@@ -5,9 +5,8 @@ import { closeWindow, minimizeWindow, toggleWindowSize } from "../utils/window-t
 
 
 export default function MainWindow() {
-
   return (
-    <div className="h-full flex flex-col">
+    <>
       <header className="h-8 flex-none flex select-none">
         <div className="bg-amber-400 w-full" data-tauri-drag-region></div>
 
@@ -18,9 +17,9 @@ export default function MainWindow() {
         </div>
       </header>
 
-      <main className="flex-1 overflow-hidden p-1">
+      <main className="flex-1 overflow-hidden p-1 border-3">
         <Outlet />
       </main>
-    </div>
+    </>
   );
 }
