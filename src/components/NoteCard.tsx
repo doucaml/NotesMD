@@ -2,9 +2,12 @@ import { BookOpen, Pen } from "lucide-react";
 import { useState } from "react";
 import Markdown from "react-markdown";
 import remarkGfm from "remark-gfm";
+import { useNote } from "../contexts/NoteContext";
 
-export default function NoteCard({ title, content } : { title: string, content: string }) {
-  const [markdownText, setMarkdownText] = useState(content)
+
+export default function NoteCard({ title }: { title: string }) {
+  const { content, setContent } = useNote()
+
   const [titleText, setTitleText] = useState(title)
   const [mode, setMode] = useState<"editor" | "preview">(
     content.length === 0 ? "editor" : "preview"
@@ -45,13 +48,13 @@ export default function NoteCard({ title, content } : { title: string, content: 
         {
           mode === "editor" ?
             <textarea
-              value={markdownText}
-              onInput={(e) => setMarkdownText(e.currentTarget.value)}
+              value={content}
+              onInput={(e) => setContent(e.currentTarget.value)}
               className="w-full flex-1 resize-none focus:outline-none focus:ring-0"
             />
             :
           <div className="flex-1 overflow-y-auto prose prose-sm prose-h1:text-2xl w-full max-w-none">
-            <Markdown remarkPlugins={[remarkGfm]}>{markdownText}</Markdown>
+            <Markdown remarkPlugins={[remarkGfm]}>{content}</Markdown>
           </div>
         }
       </div>
