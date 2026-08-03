@@ -12,8 +12,11 @@ import remarkGfm from "remark-gfm";
 export const DIR_PATH_KEY = "NOTES_DIR_PATH"
 
 const openNoteWindow = async (uid: string | null) => {
-  let windowLabel
-  let url = "http://localhost:1420/notes/"
+  const windowLabel = uid ?? "new-note"
+  const route = uid
+    ? `/notes/${encodeURIComponent(uid)}`
+    : "/notes/new"
+  const url = `${window.location.origin}/#${route}`
 
   const windowOptions = {
     decorations: false,
@@ -21,26 +24,16 @@ const openNoteWindow = async (uid: string | null) => {
     height: 500
   }
 
-  if (uid) {
-    windowLabel = uid;
-    url += uid
-  }
-
-  else {
-    windowLabel = "new-note"
-    url += "new"
-  }
-
-  const noteWebView = await WebviewWindow.getByLabel(windowLabel);
+  const noteWebView = await WebviewWindow.getByLabel(windowLabel)
 
   if (noteWebView !== null)
-    noteWebView.setFocus()
+    await noteWebView.setFocus()
 
   else
     new WebviewWindow(
       windowLabel,
-      { url: url, ...windowOptions }
-    );
+      { url, ...windowOptions }
+    )
 }
 
 const deleteNote = async (uid: string) => {
