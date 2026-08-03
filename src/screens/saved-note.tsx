@@ -2,27 +2,28 @@ import { useParams } from "react-router";
 import NoteCard from "../components/NoteCard";
 import { readTextFile } from "@tauri-apps/plugin-fs";
 import { DIR_PATH_KEY } from "./home";
-import { useEffect } from "react";
+import { useEffect, useMemo } from "react";
 import { useNote } from "../contexts/NoteContext";
-
 
 
 export default function SavedNote() {
   const uid = useParams().uid
+  const dirPath = useMemo(() => localStorage.getItem(DIR_PATH_KEY), [])
+
   const { setContent } = useNote()
 
   useEffect(() => {
-    const getContent = async (uid: string) => {
-      const filename = `${localStorage.getItem(DIR_PATH_KEY)!}/${uid}.md`
+    if (!dirPath) return
 
+    const filename = `${dirPath}/${uid}.md`
+
+    const getContent = async () => {
       const text = await readTextFile(filename)
       setContent(text)
     }
 
-    getContent(uid!)
-  }, [])
+    getContent()
+  }, [uid, dirPath])
 
-  // const content = await getContent()
-
-  return <NoteCard title="" />
+  return <NoteCard />
 }

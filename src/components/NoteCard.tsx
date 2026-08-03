@@ -5,35 +5,18 @@ import remarkGfm from "remark-gfm";
 import { useNote } from "../contexts/NoteContext";
 
 
-export default function NoteCard({ title }: { title: string }) {
+export default function NoteCard() {
   const { content, setContent } = useNote()
 
-  const [titleText, setTitleText] = useState(title)
-  const [mode, setMode] = useState<"editor" | "preview">(
-    content.length === 0 ? "editor" : "preview"
-  )
-
-  const toggleMode = () => {
-    if (mode === "editor")
-      setMode("preview")
-
-    else
-      setMode("editor")
-  }
+  const [mode, setMode] = useState<"editor" | "preview">("editor")
+  const toggleMode = () => mode === "editor" ? setMode("preview") : setMode("editor")
 
   return (
     <div className="flex flex-col h-full gap-y-4 p-1 bg-amber-100 overflow-hidden">
       <div className="flex flex-row justify-between items-center">
-        <input
-          className="w-full font-bold text-xl focus:outline-none focus:ring-0"
-          placeholder="No title"
-          value={titleText}
-          onInput={(e) => setTitleText(e.currentTarget.value)}
-        />
-
         <button
           onClick={toggleMode}
-          className="p-2 rounded-md bg-blue-500 text-white"
+          className="ml-auto p-2 rounded-md bg-blue-500 text-white"
         >
           {
             mode === "editor" ?

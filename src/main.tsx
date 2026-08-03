@@ -20,7 +20,7 @@ ReactDOM
                 <Route index element={ <Home /> }/>
               </Route>
 
-              <Route path="notes" element={ <NoteWindow /> }>
+              <Route path="notes" element={<NoteWindow />}>
                 <Route path="new" element={<NewNote />} />
                 <Route path=":uid" element={<SavedNote />} />
               </Route>

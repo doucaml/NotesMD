@@ -1,9 +1,12 @@
+import { emit, listen, type UnlistenFn } from "@tauri-apps/api/event";
 import { homeDir } from "@tauri-apps/api/path";
 import { WebviewWindow } from "@tauri-apps/api/webviewWindow";
 import { open } from '@tauri-apps/plugin-dialog';
-import { readDir, watchImmediate } from "@tauri-apps/plugin-fs";
+import { readDir, readTextFile, remove } from "@tauri-apps/plugin-fs";
 import { Plus } from "lucide-react";
-import { useEffect, useState } from "react";
+import { useEffect, useMemo, useState } from "react";
+import Markdown from "react-markdown";
+import remarkGfm from "remark-gfm";
 
 
 export const DIR_PATH_KEY = "NOTES_DIR_PATH"
@@ -40,6 +43,14 @@ const openNoteWindow = async (uid: string | null) => {
     );
 }
 
+const deleteNote = async (uid: string) => {
+  const dirPath = localStorage.getItem(DIR_PATH_KEY)
+  if (!dirPath) throw new Error("notes folders not found.")
+
+  const filePath = dirPath  + "/" + uid + ".md"
+  await remove(filePath)
+}
+
 const openDialog = async () => {
   const homeDirPath = await homeDir()
   const filePath = await open({
@@ -52,86 +63,150 @@ const openDialog = async () => {
     localStorage.setItem(DIR_PATH_KEY, filePath)
 }
 
-export default function Home() {
-  const isDirPicked = localStorage.getItem(DIR_PATH_KEY) !== null
-  const dirPath = localStorage.getItem(DIR_PATH_KEY)!
+const getData = async () => {
+  const dirPath = localStorage.getItem(DIR_PATH_KEY)
+  if (!dirPath) throw new Error("notes folders not found.")
 
-  const [notes, setNotes] = useState<string[]>([])
+  const files = (await readDir(dirPath))
+    .filter((entry) => entry.isFile && entry.name.endsWith(".md"))
+    .map(entry => entry.name)
 
-  const getNotes = async () => {
-    const entries = await readDir(dirPath)
+  const data = []
 
-    setNotes(
-      entries
-      .filter(entry => entry.isFile)
-      .map(filename => filename.name.slice(0, -3))
-    )
+  for (const file of files) {
+    const filePath = localStorage.getItem(DIR_PATH_KEY) + `/${file}`
+    const content = await readTextFile(filePath)
+
+    data.push({
+      name: file.slice(0, -3),
+      content: content
+    })
   }
 
-  useEffect(() => {
-    getNotes()
-    console.log("initial trigger")
-  }, [])
+  return data
+}
+
+export default function Home() {
+  const dirPath = useMemo(() => localStorage.getItem(DIR_PATH_KEY), [])
+  const isDirPicked = dirPath !== null
+
+  const [notes, setNotes] = useState<{ name: string, content: string }[]>([])
+
+  const getNotes = async () => {
+    const data = await getData()
+    setNotes(data)
+  }
+
+  const onDelete = async (name: string) => {
+    await deleteNote(name)
+    await emit("notes-reload-signal")
+}
 
   useEffect(() => {
-    const watchChange = async () => {
-      await watchImmediate(
-        dirPath,
-        () => {
-          getNotes()
-          console.log("triggered")
-        }
-      )
+    if (!dirPath)
+      throw new Error("Notes folder not found.")
+
+    let unlistenFn: UnlistenFn
+
+    const listenSignal = async () => {
+      unlistenFn = await listen("notes-reload-signal", () => {
+        getNotes()
+      })
     }
 
-    watchChange()
+    getNotes()
+    listenSignal()
+
+    return () => {
+      if (unlistenFn)
+        unlistenFn()
+    }
   }, [])
 
+
+
   return (
-    <div className="h-full flex flex-col overflow-hidden" >
+    <div className="h-full flex flex-col overflow-hidden gap-y-4" >
+      <div className="flex justify-between items-center h-10">
+        <h1 className="font-bold text-xl">notes.md</h1>
+
+        {
+          notes.length !== 0 &&
+
+          < button
+            className="p-2 w-fit ml-auto bg-blue-600 text-white"
+            onClick={() => openNoteWindow(null)}
+          >
+            <Plus />
+          </button >
+        }
+      </div>
+
       {
         !isDirPicked ?
-        <div className="flex-1 flex overflow-y-auto">
+        <div className="flex-1 flex">
           <div className="flex m-auto flex-col gap-y-4">
             <h1 className="">Choose a folder where your notes will be saved</h1>
             <button
-              className="m-auto p-3 rounded-xl bg-blue-500 text-white font-semibold"
+              className="m-auto p-3 bg-blue-500 text-white font-semibold"
               onClick={openDialog}
             >
               Open folder menu
             </button>
           </div>
         </div>
-          :
-        <div className="flex-1 flex flex-col gap-y-4 overflow-y-auto">
-          < button
-            className="p-2 w-fit ml-auto bg-blue-600 rounded-xl text-white"
-            onClick={() => openNoteWindow(null)}
-          >
-            <Plus />
-          </button >
-
-            <div className="flex flex-col gap-y-4">
-            {
-              notes
-                .map((note, key) => (
-                  <div
-                    className="flex flex-col gap-y-4 p-3 bg-amber-200 rounded-2xl"
-                    key={key}
+        :
+        <>
+          {
+            notes.length === 0 ?
+              <div className="m-auto flex flex-col items-center gap-y-8">
+                <p>No note for now</p>
+                  <button
+                    className="p-2 bg-blue-500 text-white font-bold"
+                    onClick={() => openNoteWindow(null)}
                   >
-                    <p>{note}</p>
+                    Create a note
+                  </button>
+              </div>
+              :
+              <div className="flex-1 flex flex-col gap-y-4 overflow-y-auto">
+                <div className="flex flex-col gap-y-4">
+                  {
+                    notes
+                    .map((note, key) => (
+                      <div
+                        className="flex flex-col justify-between h-48 p-2 bg-amber-200"
+                        key={key}
+                      >
+                        <div className="prose prose-h1:text-xl line-clamp-4 w-full h-2/3">
+                          <Markdown remarkPlugins={[remarkGfm]}>
+                            {note.content}
+                          </Markdown>
+                        </div>
 
-                    <button
-                      className="bg-blue-500 text-white p-2 rounded-xl"
-                      onClick={() => openNoteWindow(note)}
-                    >open</button>
-                  </div>
-                )
-              )
+                        <div className="flex justify-around">
+                          <button
+                            className="bg-blue-500 text-white w-2/5 p-2"
+                            onClick={() => openNoteWindow(note.name)}
+                          >
+                            Open
+                          </button>
+
+                          <button
+                            className="bg-red-500 text-white w-2/5 p-2"
+                            onClick={() => onDelete(note.name)}
+                          >
+                            Delete
+                          </button>
+                        </div>
+                      </div>
+                    ))
+                  }
+                </div>
+              </div>
             }
-          </div>
-        </div>
-      }
+        </>
+        }
     </div>
   )
 }

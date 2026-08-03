@@ -13,9 +13,10 @@
     "windows": [
       {
         "title": "notes-md",
-        "width": 450,
-        "height": 850,
-        "decorations": false
+        "width": 400,
+        "height": 800,
+        "decorations": false,
+        "resizable": false
       }
     ],
     "security": {

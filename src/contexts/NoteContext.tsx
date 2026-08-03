@@ -2,9 +2,7 @@ import { createContext, useContext, useState } from "react";
 import type { ReactNode } from "react";
 
 type NoteContextType = {
-  uid: string
   content: string
-  setUid: (text: string) => void
   setContent: (text: string) => void
 }
 
@@ -16,17 +14,16 @@ export function useNote() {
   if (context === null)
     throw new Error("Note context cannot be accessed outside a NoteProvider children.")
 
-  const { uid, content, setUid, setContent } = context
+  const { content, setContent } = context
 
-  return { uid, content, setUid, setContent }
+  return { content, setContent }
 }
 
 export function NoteProvider({ children }: { children: ReactNode }) {
   const [content, setContent] = useState("")
-  const [uid, setUid] = useState("")
 
   return (
-    <NoteContext value={{ uid, content, setUid, setContent }}>
+    <NoteContext value={{ content, setContent }}>
       { children }
     </NoteContext>
   )

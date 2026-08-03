@@ -1,23 +1,22 @@
 import { Outlet} from "react-router";
 import { WindowButton } from "../components/WindowButton";
-import { Minus, Square, X } from "lucide-react";
-import { closeWindow, minimizeWindow, toggleWindowSize } from "../utils/window-tab-helper";
+import { Minus, X } from "lucide-react";
+import { closeWindow, minimizeWindow } from "../utils/window-tab-helper";
 
 
 export default function MainWindow() {
   return (
     <>
-      <header className="h-8 flex-none flex select-none">
-        <div className="bg-amber-400 w-full" data-tauri-drag-region></div>
+      <header className="bg-gray-200 h-8 flex-none flex select-none">
+        <div className="w-full" data-tauri-drag-region></div>
 
-        <div className="flex justify-around w-24 h-full bg-blue-200">
+        <div className="flex justify-around w-24 h-full">
           <WindowButton Icon={Minus} onClick={minimizeWindow} />
-          <WindowButton Icon={Square} onClick={toggleWindowSize} />
           <WindowButton Icon={X} onClick={closeWindow} />
         </div>
       </header>
 
-      <main className="flex-1 overflow-hidden p-1 border-3">
+      <main className="flex-1 overflow-hidden p-1">
         <Outlet />
       </main>
     </>
