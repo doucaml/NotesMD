@@ -10,15 +10,16 @@ import remarkGfm from "remark-gfm";
 
 
 export const DIR_PATH_KEY = "NOTES_DIR_PATH"
+export const URL_BASE = window.location.origin
 
 const openNoteWindow = async (uid: string | null) => {
-  const windowLabel = uid ?? "new-note"
-  const route = uid
-    ? `/notes/${encodeURIComponent(uid)}`
-    : "/notes/new"
-  const url = `${window.location.origin}/#${route}`
+  const windowLabel = uid || "new-note"
+
+  const route = uid ? uid : "new"
+  const url = URL_BASE + "/notes/" + route
 
   const windowOptions = {
+    title: 'Note - notes.md',
     decorations: false,
     width: 500,
     height: 500
