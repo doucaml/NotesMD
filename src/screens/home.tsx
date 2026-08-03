@@ -53,8 +53,10 @@ const openDialog = async () => {
     defaultPath: homeDirPath
   })
 
-  if (filePath)
+  if (filePath) {
     localStorage.setItem(DIR_PATH_KEY, filePath)
+    await emit("notes-reload-signal")
+  }
 }
 
 const getData = async () => {
@@ -97,8 +99,7 @@ export default function Home() {
 }
 
   useEffect(() => {
-    if (!dirPath)
-      throw new Error("Notes folder not found.")
+    if (!dirPath) return
 
     let unlistenFn: UnlistenFn
 
