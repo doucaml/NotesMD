@@ -1,5 +1,5 @@
 import NoteCard from "../components/NoteCard";
 
 export default function NewNote() {
-  return <NoteCard />
+  return <NoteCard initialMode="editor" />
 }

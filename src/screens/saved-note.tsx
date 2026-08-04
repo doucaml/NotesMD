@@ -1,4 +1,4 @@
-import { useParams } from "react-router";
+import { useParams, useSearchParams } from "react-router";
 import NoteCard from "../components/NoteCard";
 import { readTextFile } from "@tauri-apps/plugin-fs";
 import { DIR_PATH_KEY } from "./home";
@@ -7,8 +7,11 @@ import { useNote } from "../contexts/NoteContext";
 
 
 export default function SavedNote() {
-  const uid = useParams().uid
   const dirPath = useMemo(() => localStorage.getItem(DIR_PATH_KEY), [])
+
+  const uid = useParams().uid
+  const [additionalParams] = useSearchParams()
+  const mode = additionalParams.get("mode")
 
   const { setContent } = useNote()
 
@@ -25,5 +28,5 @@ export default function SavedNote() {
     getContent()
   }, [uid, dirPath])
 
-  return <NoteCard />
+  return <NoteCard initialMode={mode === "editor" ? "editor" : "preview"} />
 }

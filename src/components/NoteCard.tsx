@@ -5,10 +5,12 @@ import remarkGfm from "remark-gfm";
 import { useNote } from "../contexts/NoteContext";
 
 
-export default function NoteCard() {
+type ModeType = "editor" | "preview"
+
+export default function NoteCard({ initialMode } : { initialMode : ModeType }) {
   const { content, setContent } = useNote()
 
-  const [mode, setMode] = useState<"editor" | "preview">("editor")
+  const [mode, setMode] = useState<ModeType>(initialMode)
   const toggleMode = () => mode === "editor" ? setMode("preview") : setMode("editor")
 
   return (

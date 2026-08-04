@@ -3,7 +3,7 @@ import { homeDir } from "@tauri-apps/api/path";
 import { WebviewWindow } from "@tauri-apps/api/webviewWindow";
 import { open } from '@tauri-apps/plugin-dialog';
 import { readDir, readTextFile, remove } from "@tauri-apps/plugin-fs";
-import { Plus } from "lucide-react";
+import { Pen, Plus } from "lucide-react";
 import { useEffect, useMemo, useState } from "react";
 import Markdown from "react-markdown";
 import remarkGfm from "remark-gfm";
@@ -12,11 +12,11 @@ import remarkGfm from "remark-gfm";
 export const DIR_PATH_KEY = "NOTES_DIR_PATH"
 export const URL_BASE = window.location.origin
 
-const openNoteWindow = async (uid: string | null) => {
+const openNoteWindow = async (uid: string | null, inEditorMode: Boolean = false) => {
   const windowLabel = uid || "new-note"
 
   const route = uid ? uid : "new"
-  const url = URL_BASE + "/notes/" + route
+  const url = URL_BASE + "/notes/" + route + (inEditorMode ? "?mode=editor" : "")
 
   const windowOptions = {
     title: 'Note - notes.md',
@@ -119,7 +119,6 @@ export default function Home() {
   }, [])
 
 
-
   return (
     <div className="h-full flex flex-col overflow-hidden gap-y-4" >
       <div className="flex justify-between items-center h-10">
@@ -182,9 +181,9 @@ export default function Home() {
                         <div className="flex justify-around">
                           <button
                             className="bg-blue-500 text-white w-2/5 p-2"
-                            onClick={() => openNoteWindow(note.name)}
+                            onClick={() => openNoteWindow(note.name, true)}
                           >
-                            Open
+                            <Pen />
                           </button>
 
                           <button
