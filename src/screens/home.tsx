@@ -12,7 +12,7 @@ import remarkGfm from "remark-gfm";
 export const DIR_PATH_KEY = "NOTES_DIR_PATH"
 export const URL_BASE = window.location.origin
 
-const openNoteWindow = async (uid: string | null, inEditorMode: Boolean = false) => {
+const openNoteWindow = async (uid: string | null, inEditorMode: boolean = false) => {
   const windowLabel = uid || "new-note"
 
   const route = uid ? uid : "new"
@@ -22,7 +22,8 @@ const openNoteWindow = async (uid: string | null, inEditorMode: Boolean = false)
     title: 'Note - notes.md',
     decorations: false,
     width: 500,
-    height: 500
+    height: 500,
+    backgroundColor: '#fef9c3'
   }
 
   const noteWebView = await WebviewWindow.getByLabel(windowLabel)

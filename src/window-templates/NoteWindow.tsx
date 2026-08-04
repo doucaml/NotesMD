@@ -75,7 +75,7 @@ export default function NoteWindow() {
         </div>
       </header>
 
-      <main className="flex-1 overflow-hidden p-1">
+      <main className="bg-yellow-100 flex-1 p-1">
         <Outlet />
       </main>
     </>
