@@ -14,11 +14,11 @@ export default function NoteCard({ initialMode } : { initialMode : ModeType }) {
   const toggleMode = () => mode === "editor" ? setMode("preview") : setMode("editor")
 
   return (
-    <div className="flex flex-col h-full gap-y-4 p-1 bg-amber-100 overflow-hidden">
+    <div className="flex flex-col h-full gap-y-4 p-1 overflow-hidden">
       <div className="flex flex-row justify-between items-center">
         <button
           onClick={toggleMode}
-          className="ml-auto p-2 rounded-md bg-blue-500 text-white"
+          className="ml-auto p-2 cursor-pointer rounded-md hover:bg-gray-50"
         >
           {
             mode === "editor" ?
@@ -35,11 +35,13 @@ export default function NoteCard({ initialMode } : { initialMode : ModeType }) {
             <textarea
               value={content}
               onInput={(e) => setContent(e.currentTarget.value)}
-              className="w-full flex-1 resize-none focus:outline-none focus:ring-0"
+              className="w-full flex-1 antialiased resize-none focus:outline-none focus:ring-0"
             />
             :
-          <div className="flex-1 overflow-y-auto prose prose-sm prose-h1:text-2xl w-full max-w-none">
-            <Markdown remarkPlugins={[remarkGfm]}>{content}</Markdown>
+            <div
+              className="flex-1 overflow-y-auto prose prose-sm prose-h1:text-[21px] prose-li:marker:text-black w-full max-w-none"
+            >
+              <Markdown remarkPlugins={[remarkGfm]}>{content}</Markdown>
           </div>
         }
       </div>

@@ -3,7 +3,7 @@ import { homeDir } from "@tauri-apps/api/path";
 import { WebviewWindow } from "@tauri-apps/api/webviewWindow";
 import { open } from '@tauri-apps/plugin-dialog';
 import { readDir, readTextFile, remove } from "@tauri-apps/plugin-fs";
-import { Pen, Plus } from "lucide-react";
+import { Pen, Plus, Trash } from "lucide-react";
 import { useEffect, useMemo, useState } from "react";
 import Markdown from "react-markdown";
 import remarkGfm from "remark-gfm";
@@ -12,7 +12,7 @@ import remarkGfm from "remark-gfm";
 export const DIR_PATH_KEY = "NOTES_DIR_PATH"
 export const URL_BASE = window.location.origin
 
-const openNoteWindow = async (uid: string | null, inEditorMode: boolean = false) => {
+const openNoteWindow = async (uid: string | null, inEditorMode: Boolean = false) => {
   const windowLabel = uid || "new-note"
 
   const route = uid ? uid : "new"
@@ -97,7 +97,7 @@ export default function Home() {
   const onDelete = async (name: string) => {
     await deleteNote(name)
     await emit("notes-reload-signal")
-}
+  }
 
   useEffect(() => {
     if (!dirPath) return
@@ -120,6 +120,7 @@ export default function Home() {
   }, [])
 
 
+
   return (
     <div className="h-full flex flex-col overflow-hidden gap-y-4" >
       <div className="flex justify-between items-center h-10">
@@ -129,7 +130,7 @@ export default function Home() {
           notes.length !== 0 &&
 
           < button
-            className="p-2 w-fit ml-auto bg-blue-600 text-white"
+            className="p-2 w-fit ml-auto rounded-lg cursor-pointer bg-blue-600 text-white"
             onClick={() => openNoteWindow(null)}
           >
             <Plus />
@@ -143,7 +144,7 @@ export default function Home() {
           <div className="flex m-auto flex-col gap-y-4">
             <h1 className="">Choose a folder where your notes will be saved</h1>
             <button
-              className="m-auto p-3 bg-blue-500 text-white font-semibold"
+              className="m-auto p-3 rounded-md cursor-pointer bg-blue-600 text-white font-semibold"
               onClick={openDialog}
             >
               Open folder menu
@@ -165,33 +166,42 @@ export default function Home() {
               </div>
               :
               <div className="flex-1 flex flex-col gap-y-4 overflow-y-auto">
-                <div className="flex flex-col gap-y-4">
+                <div className="flex flex-col gap-y-6">
                   {
                     notes
                     .map((note, key) => (
                       <div
-                        className="flex flex-col justify-between h-48 p-2 bg-amber-200"
+                        className="flex flex-col p-1 gap-y-2"
                         key={key}
                       >
-                        <div className="prose prose-h1:text-xl line-clamp-4 w-full h-2/3">
-                          <Markdown remarkPlugins={[remarkGfm]}>
-                            {note.content}
-                          </Markdown>
+                        <div className="bg-yellow-100 rounded-lg h-48 p-2 ">
+                          <div
+                            onClick={() => openNoteWindow(note.name)}
+                            className="
+                            h-full overflow-hidden cursor-pointer
+                            prose prose-sm prose-h1:text-[21px]
+                            prose-li:marker:text-black
+                            "
+                          >
+                            <Markdown remarkPlugins={[remarkGfm]}>
+                              {note.content}
+                            </Markdown>
+                          </div>
                         </div>
 
-                        <div className="flex justify-around">
+                        <div className="flex justify-end gap-x-4">
                           <button
-                            className="bg-blue-500 text-white w-2/5 p-2"
+                            className="p-2 cursor-pointer bg-gray-200 hover:bg-gray-500 rounded-md hover:text-white"
                             onClick={() => openNoteWindow(note.name, true)}
                           >
                             <Pen />
                           </button>
 
                           <button
-                            className="bg-red-500 text-white w-2/5 p-2"
+                            className="p-2 cursor-pointer bg-gray-200 hover:bg-red-500 rounded-md hover:text-white"
                             onClick={() => onDelete(note.name)}
                           >
-                            Delete
+                            <Trash />
                           </button>
                         </div>
                       </div>
