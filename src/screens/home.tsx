@@ -1,19 +1,18 @@
 import { emit, listen, type UnlistenFn } from "@tauri-apps/api/event";
-import { homeDir } from "@tauri-apps/api/path";
+import { BaseDirectory } from "@tauri-apps/api/path";
 import { WebviewWindow } from "@tauri-apps/api/webviewWindow";
-import { open } from '@tauri-apps/plugin-dialog';
-import { readDir, readTextFile, remove } from "@tauri-apps/plugin-fs";
+import { exists, mkdir, readDir, readTextFile, remove } from "@tauri-apps/plugin-fs";
 import { Pen, Plus, Trash } from "lucide-react";
-import { useEffect, useMemo, useState } from "react";
+import { useEffect, useState } from "react";
 import Markdown from "react-markdown";
 import remarkGfm from "remark-gfm";
 
 
-export const DIR_PATH_KEY = "NOTES_DIR_PATH"
 export const URL_BASE = window.location.origin
+export const NOTES_DIR = "notes/"
 
 const openNoteWindow = async (uid: string | null, inEditorMode: Boolean = false) => {
-  const windowLabel = uid || "new-note"
+  const windowLabel =  uid || "new-note"
 
   const route = uid ? uid : "new"
   const url = URL_BASE + "/notes/" + route + (inEditorMode ? "?mode=editor" : "")
@@ -39,40 +38,31 @@ const openNoteWindow = async (uid: string | null, inEditorMode: Boolean = false)
 }
 
 const deleteNote = async (uid: string) => {
-  const dirPath = localStorage.getItem(DIR_PATH_KEY)
-  if (!dirPath) throw new Error("notes folders not found.")
-
-  const filePath = dirPath  + "/" + uid + ".md"
-  await remove(filePath)
+  const filePath = NOTES_DIR + uid + ".md"
+  await remove(filePath, { baseDir: BaseDirectory.AppData })
 }
 
-const openDialog = async () => {
-  const homeDirPath = await homeDir()
-  const filePath = await open({
-    multiple: false,
-    directory: true,
-    defaultPath: homeDirPath
-  })
+const getOrCreateNotesDir = async () => {
+  const alreadyExist = await exists(NOTES_DIR, { baseDir: BaseDirectory.AppData })
 
-  if (filePath) {
-    localStorage.setItem(DIR_PATH_KEY, filePath)
-    await emit("notes-reload-signal")
-  }
+  if (!alreadyExist)
+    await mkdir(NOTES_DIR, { baseDir: BaseDirectory.AppData })
+
+  const dir = await readDir(NOTES_DIR, { baseDir: BaseDirectory.AppData })
+
+  return dir
 }
 
 const getData = async () => {
-  const dirPath = localStorage.getItem(DIR_PATH_KEY)
-  if (!dirPath) throw new Error("notes folders not found.")
-
-  const files = (await readDir(dirPath))
+  const files = (await getOrCreateNotesDir())
     .filter((entry) => entry.isFile && entry.name.endsWith(".md"))
     .map(entry => entry.name)
 
   const data = []
 
   for (const file of files) {
-    const filePath = localStorage.getItem(DIR_PATH_KEY) + `/${file}`
-    const content = await readTextFile(filePath)
+    const filePath = NOTES_DIR + file
+    const content = await readTextFile(filePath, { baseDir: BaseDirectory.AppData })
 
     data.push({
       name: file.slice(0, -3),
@@ -84,9 +74,6 @@ const getData = async () => {
 }
 
 export default function Home() {
-  const dirPath = useMemo(() => localStorage.getItem(DIR_PATH_KEY), [])
-  const isDirPicked = dirPath !== null
-
   const [notes, setNotes] = useState<{ name: string, content: string }[]>([])
 
   const getNotes = async () => {
@@ -100,7 +87,7 @@ export default function Home() {
   }
 
   useEffect(() => {
-    if (!dirPath) return
+
 
     let unlistenFn: UnlistenFn
 
@@ -118,8 +105,6 @@ export default function Home() {
         unlistenFn()
     }
   }, [])
-
-
 
   return (
     <div className="h-full flex flex-col overflow-hidden gap-y-4" >
@@ -139,79 +124,63 @@ export default function Home() {
       </div>
 
       {
-        !isDirPicked ?
-        <div className="flex-1 flex">
-          <div className="flex m-auto flex-col gap-y-4">
-            <h1 className="">Choose a folder where your notes will be saved</h1>
+        notes.length === 0 ?
+        <div className="m-auto flex flex-col items-center gap-y-8">
+          <p>No note for now</p>
             <button
-              className="m-auto p-3 rounded-md cursor-pointer bg-blue-600 text-white font-semibold"
-              onClick={openDialog}
+              className="p-2 bg-blue-500 text-white font-bold rounded-md"
+              onClick={() => openNoteWindow(null)}
             >
-              Open folder menu
+              Create a note
             </button>
-          </div>
         </div>
         :
-        <>
-          {
-            notes.length === 0 ?
-              <div className="m-auto flex flex-col items-center gap-y-8">
-                <p>No note for now</p>
-                  <button
-                    className="p-2 bg-blue-500 text-white font-bold"
-                    onClick={() => openNoteWindow(null)}
-                  >
-                    Create a note
-                  </button>
-              </div>
-              :
-              <div className="flex-1 flex flex-col gap-y-4 overflow-y-auto">
-                <div className="flex flex-col gap-y-6">
-                  {
-                    notes
-                    .map((note, key) => (
-                      <div
-                        className="flex flex-col p-1 gap-y-2"
-                        key={key}
-                      >
-                        <div className="bg-yellow-100 rounded-lg h-48 p-2 ">
-                          <div
-                            onClick={() => openNoteWindow(note.name)}
-                            className="
-                            h-full overflow-hidden cursor-pointer
-                            prose prose-sm prose-h1:text-[21px]
-                            prose-li:marker:text-black
-                            "
-                          >
-                            <Markdown remarkPlugins={[remarkGfm]}>
-                              {note.content}
-                            </Markdown>
-                          </div>
-                        </div>
+        <div className="flex-1 flex flex-col gap-y-4 overflow-y-auto">
+          <div className="flex flex-col gap-y-6">
+            {
+              notes
+              .map((note, key) => (
+                <div
+                  className="flex flex-col p-1 gap-y-2"
+                  key={key}
+                >
+                  <div className="bg-yellow-100 rounded-lg h-48 p-2 ">
+                    <div
+                      onClick={() => openNoteWindow(note.name)}
+                      className="
+                      h-full overflow-hidden cursor-pointer
+                      prose prose-sm prose-h1:text-[21px]
+                      prose-li:marker:text-black
+                      "
+                    >
+                      <Markdown remarkPlugins={[remarkGfm]}>
+                        {note.content}
+                      </Markdown>
+                    </div>
+                  </div>
 
-                        <div className="flex justify-end gap-x-4">
-                          <button
-                            className="p-2 cursor-pointer bg-gray-200 hover:bg-gray-500 rounded-md hover:text-white"
-                            onClick={() => openNoteWindow(note.name, true)}
-                          >
-                            <Pen />
-                          </button>
+                  <div className="flex justify-end gap-x-4">
+                    <button
+                      className="p-2 cursor-pointer bg-gray-200 hover:bg-gray-500 rounded-md hover:text-white"
+                      onClick={() => openNoteWindow(note.name, true)}
+                    >
+                      <Pen />
+                    </button>
 
-                          <button
-                            className="p-2 cursor-pointer bg-gray-200 hover:bg-red-500 rounded-md hover:text-white"
-                            onClick={() => onDelete(note.name)}
-                          >
-                            <Trash />
-                          </button>
-                        </div>
-                      </div>
-                    ))
-                  }
+                    <button
+                      className="p-2 cursor-pointer bg-gray-200 hover:bg-red-500 rounded-md hover:text-white"
+                      onClick={() => onDelete(note.name)}
+                    >
+                      <Trash />
+                    </button>
+                  </div>
                 </div>
-              </div>
+              ))
             }
-        </>
-        }
+          </div>
+        </div>
+      }
+
     </div>
   )
 }

@@ -3,50 +3,50 @@ import { WindowButton } from "../components/WindowButton";
 import { Minus, X } from "lucide-react";
 import { closeWindow, minimizeWindow } from "../utils/window-tab-helper";
 import { getCurrentWindow } from "@tauri-apps/api/window";
-import { open, remove } from "@tauri-apps/plugin-fs";
-import { DIR_PATH_KEY } from "../screens/home";
+import { BaseDirectory, open, remove } from "@tauri-apps/plugin-fs";
 import { useNote } from "../contexts/NoteContext";
 import { emit } from "@tauri-apps/api/event";
+import { NOTES_DIR } from "../screens/home";
 
 const saveNote = async (content: string, uid: string | null) => {
-  let filePath = localStorage.getItem(DIR_PATH_KEY)
+  let filePath: string
 
   if (uid)
-    filePath += ("/" + uid + ".md")
+    filePath = NOTES_DIR + uid + ".md"
 
   else {
     const dateTimeString = new Date().toISOString().replace(/\D/g, "")
-    filePath += "/note-" + dateTimeString + ".md"
+    filePath = NOTES_DIR + "note-" + dateTimeString + ".md"
   }
 
-  if (filePath) {
-    if (uid && content.trim().length !== 0) {
-      const file = await open(filePath, {
-        write: true,
-        truncate: true
-      })
+  if (uid && content.trim().length !== 0) {
+    const file = await open(filePath, {
+      write: true,
+      truncate: true,
+      baseDir: BaseDirectory.AppData
+    })
 
-      await file.write(new TextEncoder().encode(content))
-      await file.close()
-    }
-
-    else if (uid && content.trim().length === 0) {
-      await remove(filePath)
-    }
-
-    else if (!uid && content.trim().length !== 0) {
-      const file = await open(filePath, {
-        write: true,
-        create: true,
-        truncate: true
-      })
-
-      await file.write(new TextEncoder().encode(content))
-      await file.close()
-    }
-
-    await emit("notes-reload-signal")
+    await file.write(new TextEncoder().encode(content))
+    await file.close()
   }
+
+  else if (uid && content.trim().length === 0) {
+    await remove(filePath, { baseDir: BaseDirectory.AppData })
+  }
+
+  else if (!uid && content.trim().length !== 0) {
+    const file = await open(filePath, {
+      write: true,
+      create: true,
+      truncate: true,
+      baseDir: BaseDirectory.AppData
+    })
+
+    await file.write(new TextEncoder().encode(content))
+    await file.close()
+  }
+
+  await emit("notes-reload-signal")
 }
 
 export default function NoteWindow() {
