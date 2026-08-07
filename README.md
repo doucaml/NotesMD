@@ -24,8 +24,8 @@
 
 <p align="center">
   <img src="screenshots/home.png" alt="notes.md home screen" width="31%" />
-  <img src="screenshots/note%20-%20editor%20mode.png" alt="notes.md editor mode" width="31%" />
-  <img src="screenshots/note%20-%20preview%20mode.png" alt="notes.md preview mode" width="31%" />
+  <img src="screenshots/note-editor.png" alt="notes.md editor mode" width="31%" />
+  <img src="screenshots/note-preview.png" alt="notes.md preview mode" width="31%" />
 </p>
 
 ## Installation
@@ -38,29 +38,26 @@ Choose the package matching your operating system:
 - **Windows:** `.msi` or `.exe`
 - **Linux:** `.AppImage`, `.deb` or `.rpm`
 
-### Linux AppImage
+Alternatively, you can install notes.md through a package manager:
 
-Make the AppImage executable before launching it:
+- **Homebrew** (macOS / Linux): use the custom tap [doucaml/homebrew-notes-md](https://github.com/doucaml/homebrew-notes-md)
 
-```bash
-chmod +x notes.md_*.AppImage
-./notes.md_*.AppImage
-```
+  ```bash
+  brew tap doucaml/homebrew-notes-md
+  brew install --cask notes-md
+  ```
 
-Package-manager installations through Homebrew, Snap and Flatpak will be documented here as they become available.
+- **Snap** (Linux): available on [Snapcraft](https://snapcraft.io/notes-md)
 
-## Updating
+  ```bash
+  snap install notes-md
+  ```
 
-For a direct installation from GitHub, download and install the latest version from the [Releases page](https://github.com/doucaml/notes.md/releases/latest).
-
-Automatic in-app updates are not currently enabled for direct downloads.
-
-When package-manager distributions are available, use their standard update commands:
+Keep your installation up to date:
 
 ```bash
 brew upgrade --cask notes-md
 snap refresh notes-md
-flatpak update
 ```
 
 ## Development
