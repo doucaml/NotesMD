@@ -67,7 +67,7 @@ flatpak update
 
 ### Prerequisites
 
-- [Bun](https://bun.sh/)
+- [Node.js](https://nodejs.org/) (with npm)
 - [Rust](https://www.rust-lang.org/)
 - The system dependencies required by [Tauri](https://tauri.app/start/prerequisites/)
 
@@ -78,19 +78,19 @@ Clone the repository and install the dependencies:
 ```bash
 git clone https://github.com/doucaml/notes.md.git
 cd notes.md
-bun install
+npm install
 ```
 
 ### Run in development mode
 
 ```bash
-bun run tauri dev
+npm run tauri dev
 ```
 
 ### Build the application
 
 ```bash
-bun run tauri build
+npm run tauri build
 ```
 
 The project is built with React, TypeScript, Vite, Tailwind CSS and Tauri 2.

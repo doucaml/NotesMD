@@ -56,7 +56,7 @@ function checkVersions() {
 
 function setVersion(version) {
   if (!version || !VERSION_PATTERN.test(version)) {
-    console.error("Usage: bun run version:set -- 1.2.3");
+    console.error("Usage: npm run version:set -- 1.2.3");
     console.error("The version must follow SemVer.");
     process.exit(1);
   }

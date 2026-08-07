@@ -36,8 +36,11 @@ jobs:
         with:
           ref: ${{ inputs.ref || github.ref }}
 
-      - name: Setup Bun
-        uses: oven-sh/setup-bun@v2
+      - name: Setup Node
+        uses: actions/setup-node@v4
+        with:
+          node-version: 20
+          cache: npm
 
       - name: Setup Rust
         uses: dtolnay/rust-toolchain@stable
@@ -64,10 +67,10 @@ jobs:
             patchelf
 
       - name: Install frontend dependencies
-        run: bun install --frozen-lockfile
+        run: npm ci
 
       - name: Check synchronized version
-        run: bun run version:check
+        run: npm run version:check
 
       - name: Build and publish bundles
         uses: tauri-apps/tauri-action@v0
