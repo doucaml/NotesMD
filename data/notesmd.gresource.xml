@@ -1,0 +1,8 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<gresources>
+  <gresource prefix="/com/doucaml/notesmd">
+    <file preprocess="xml-stripblanks">ui/main-window.ui</file>
+    <file preprocess="xml-stripblanks">ui/note-window.ui</file>
+    <file preprocess="xml-stripblanks">ui/shortcuts-dialog.ui</file>
+  </gresource>
+</gresources>

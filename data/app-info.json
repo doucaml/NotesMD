@@ -1,0 +1,8 @@
+{
+  "application_name": "NotesMD",
+  "application_icon": "com.doucaml.notesmd",
+  "developer_name": "Mohamed Doucouré",
+  "version": "0.1.0",
+  "developers": ["Mohamed Doucouré"],
+  "copyright": "© 2026 Mohamed Doucouré"
+}

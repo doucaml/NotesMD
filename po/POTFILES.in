@@ -1,0 +1,8 @@
+# List of source files containing translatable strings.
+# Please keep this file sorted alphabetically.
+data/com.doucaml.notesmd.desktop.in
+data/com.doucaml.notesmd.metainfo.xml.in
+data/com.doucaml.notesmd.gschema.xml
+src/application.py
+src/main_window.py
+src/main-window.ui
