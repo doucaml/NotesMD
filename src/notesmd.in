@@ -24,28 +24,31 @@
 #
 # SPDX-License-Identifier: MIT
 
-import os
-import sys
-import signal
-import locale
 import gettext
+import locale
+import signal
+import sys
+from pathlib import Path
 
-VERSION = '@VERSION@'
-pkgdatadir = '@pkgdatadir@'
-localedir = '@localedir@'
+VERSION = "@VERSION@"
+pkgdatadir = "@pkgdatadir@"
+localedir = "@localedir@"
 
 sys.path.insert(1, pkgdatadir)
 signal.signal(signal.SIGINT, signal.SIG_DFL)
-locale.bindtextdomain('notesmd', localedir)
-locale.textdomain('notesmd')
-gettext.install('notesmd', localedir)
+locale.bindtextdomain("notesmd", localedir)
+locale.textdomain("notesmd")
+gettext.install("notesmd", localedir)
 
-if __name__ == '__main__':
+if __name__ == "__main__":
     import gi
-
     from gi.repository import Gio
-    resource = Gio.Resource.load(os.path.join(pkgdatadir, 'notesmd.gresource'))
-    resource._register()
+
+    resource_path = Path(pkgdatadir) / "notesmd.gresource"
+
+    resource = Gio.resource_load(resource_path.as_posix())
+    Gio.resources_register(resource)
 
     from notesmd import application
+
     sys.exit(application.main(VERSION))
