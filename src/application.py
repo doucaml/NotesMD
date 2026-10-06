@@ -82,8 +82,11 @@ class MainApplication(Adw.Application):
         win.present()
 
     def on_about_action(self, *args):
-        with open("/com/doucaml/notesmd/data/app-info.json") as f:
-            infos = json.load(f)
+        stream = Gio.resources_open_stream(
+            "/com/doucaml/notesmd/metadata/app-infos.json", Gio.ResourceLookupFlags.NONE
+        )
+        bytes = stream.read_bytes(4096).get_data()
+        infos = json.loads(bytes.decode("utf-8"))
 
         """Callback for the app.about action."""
         about = Adw.AboutDialog(
