@@ -48,7 +48,7 @@ class MainApplication(Adw.Application):
         self.create_action("quit", lambda *_: self.quit(), ["<control>q"])
         self.create_action("about", self.on_about_action)
         self.create_action("preferences", self.on_preferences_action)
-        self.create_action("new_note", self.on_create_new_note)
+        self.create_action("new_note", self.on_create_new_note, ["<control>n"])
 
         self.settings = Gio.Settings(schema_id="com.doucaml.notesmd")
 
