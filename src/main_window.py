@@ -38,8 +38,11 @@ class MainWindow(Adw.ApplicationWindow):
     def on_change_notes_folder(self, action, parameter):
         dialog = Gtk.FileDialog()
 
+        current_path = self.settings.get_string("notes-folder")
         home_path = GLib.get_home_dir()
-        initial_folder = Gio.File.new_for_path(str(home_path))
+        used_path = current_path if len(current_path) > 0 else home_path
+
+        initial_folder = Gio.File.new_for_path(used_path)
         dialog.set_initial_folder(initial_folder)
 
         dialog.select_folder(self, None, self.on_change_response)
