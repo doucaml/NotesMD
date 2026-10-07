@@ -21,6 +21,13 @@
                 <property name="menu-model">primary_menu</property>
               </object>
             </child>
+            <child type="end">
+                <object class="GtkButton">
+                    <property name="icon-name">folder-symbolic</property>
+                    <property name="tooltip-text" translatable="yes">Change notes folder</property>
+                    <property name="action-name">win.notes-folder</property>
+                </object>
+            </child>
           </object>
         </child>
         <property name="content">
@@ -32,7 +39,7 @@
                         <child>
                             <object class="GtkButton" id="new_note_btn">
                                 <property name="label">Create a note</property>
-                                <property name="action-name">app.new_note</property>
+                                <property name="action-name">app.new-note</property>
                             </object>
                         </child>
                     </object>
@@ -44,10 +51,6 @@
   </template>
   <menu id="primary_menu">
     <section>
-      <item>
-        <attribute name="label" translatable="yes">_Save as...</attribute>
-        <attribute name="action">win.save-as</attribute>
-      </item>
       <item>
         <attribute name="label" translatable="yes">_Keyboard Shortcuts</attribute>
         <attribute name="action">app.shortcuts</attribute>

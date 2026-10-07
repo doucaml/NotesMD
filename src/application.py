@@ -1,27 +1,3 @@
-# MIT License
-#
-# Copyright (c) 2026 Mohamed Doucouré
-#
-# Permission is hereby granted, free of charge, to any person obtaining a copy
-# of this software and associated documentation files (the "Software"), to deal
-# in the Software without restriction, including without limitation the rights
-# to use, copy, modify, merge, publish, distribute, sublicense, and/or sell
-# copies of the Software, and to permit persons to whom the Software is
-# furnished to do so, subject to the following conditions:
-#
-# The above copyright notice and this permission notice shall be included in all
-# copies or substantial portions of the Software.
-#
-# THE SOFTWARE IS PROVIDED "AS IS", WITHOUT WARRANTY OF ANY KIND, EXPRESS OR
-# IMPLIED, INCLUDING BUT NOT LIMITED TO THE WARRANTIES OF MERCHANTABILITY,
-# FITNESS FOR A PARTICULAR PURPOSE AND NONINFRINGEMENT. IN NO EVENT SHALL THE
-# AUTHORS OR COPYRIGHT HOLDERS BE LIABLE FOR ANY CLAIM, DAMAGES OR OTHER
-# LIABILITY, WHETHER IN AN ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING FROM,
-# OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE
-# SOFTWARE.
-#
-# SPDX-License-Identifier: MIT
-
 import json
 import sys
 
@@ -30,15 +6,13 @@ import gi
 gi.require_version("Gtk", "4.0")
 gi.require_version("Adw", "1")
 
-from gi.repository import Adw, Gio, GLib, Gtk
+from gi.repository import Adw, Gio, GLib
 
 from .main_window import MainWindow
 from .note_window import NoteWindow
 
 
 class MainApplication(Adw.Application):
-    """The main application singleton class."""
-
     def __init__(self):
         super().__init__(
             application_id="com.doucaml.notesmd",
@@ -48,7 +22,7 @@ class MainApplication(Adw.Application):
         self.create_action("quit", lambda *_: self.quit(), ["<control>q"])
         self.create_action("about", self.on_about_action)
         self.create_action("preferences", self.on_preferences_action)
-        self.create_action("new_note", self.on_create_new_note, ["<control>n"])
+        self.create_action("new-note", self.on_create_new_note, ["<control>n"])
 
         self.settings = Gio.Settings(schema_id="com.doucaml.notesmd")
 
@@ -68,53 +42,15 @@ class MainApplication(Adw.Application):
         self.add_action(dark_mode_action)
 
         self.set_accels_for_action("win.open", ["<Ctrl>o"])
-        self.set_accels_for_action("win.save-as", ["<Ctrl><Shift>s"])
 
     def do_activate(self):
-        """Called when the application is activated.
-
-        We raise the application's main window, creating it if
-        necessary.
-        """
         win = self.props.active_window
         if not win:
             win = MainWindow(application=self)
         win.present()
 
-    def on_about_action(self, *args):
-        stream = Gio.resources_open_stream(
-            "/com/doucaml/notesmd/metadata/app-infos.json", Gio.ResourceLookupFlags.NONE
-        )
-        bytes = stream.read_bytes(4096).get_data()
-        infos = json.loads(bytes.decode("utf-8"))
-
-        """Callback for the app.about action."""
-        about = Adw.AboutDialog(
-            application_name=infos["application_name"],
-            application_icon=infos["application_icon"],
-            developer_name=infos["developer_name"],
-            version=infos["version"],
-            developers=infos["developers"],
-            copyright=infos["copyright"],
-        )
-        # Translators: Replace "translator-credits" with your name/username, and optionally an email or URL.
-        about.set_translator_credits(_("translator-credits"))
-        about.present(self.props.active_window)
-
-    def on_preferences_action(self, widget, _):
-        """Callback for the app.preferences action."""
-        print("app.preferences action activated")
-
     def create_action(self, name, callback, shortcuts=None):
-        """Add an application action.
-
-        Args:
-            name: the name of the action
-            callback: the function to be called when the action is
-              activated
-            shortcuts: an optional list of accelerators
-        """
-        action = Gio.SimpleAction.new(name, None)
+        action = Gio.SimpleAction(name=name)
         action.connect("activate", callback)
         self.add_action(action)
 
@@ -143,9 +79,30 @@ class MainApplication(Adw.Application):
         win = NoteWindow(application=self)
         win.present()
 
+    def on_about_action(self, *args):
+        stream = Gio.resources_open_stream(
+            "/com/doucaml/notesmd/metadata/app-infos.json", Gio.ResourceLookupFlags.NONE
+        )
+        bytes = stream.read_bytes(4096).get_data()
+
+        if bytes is not None:
+            infos = json.loads(bytes.decode("utf-8"))
+
+            about = Adw.AboutDialog(
+                application_name=infos["application_name"],
+                application_icon=infos["application_icon"],
+                developer_name=infos["developer_name"],
+                version=infos["version"],
+                developers=infos["developers"],
+                copyright=infos["copyright"],
+            )
+            # about.set_translator_credits(_("translator-credits"))
+            about.present(self.props.active_window)
+
+    def on_preferences_action(self, widget, _):
+        print("app.preferences action activated")
+
 
 def main(version):
-    """The application's entry point."""
-
     app = MainApplication()
     return app.run(sys.argv)

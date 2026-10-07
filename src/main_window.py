@@ -1,27 +1,3 @@
-# MIT License
-#
-# Copyright (c) 2026 Mohamed Doucouré
-#
-# Permission is hereby granted, free of charge, to any person obtaining a copy
-# of this software and associated documentation files (the "Software"), to deal
-# in the Software without restriction, including without limitation the rights
-# to use, copy, modify, merge, publish, distribute, sublicense, and/or sell
-# copies of the Software, and to permit persons to whom the Software is
-# furnished to do so, subject to the following conditions:
-#
-# The above copyright notice and this permission notice shall be included in all
-# copies or substantial portions of the Software.
-#
-# THE SOFTWARE IS PROVIDED "AS IS", WITHOUT WARRANTY OF ANY KIND, EXPRESS OR
-# IMPLIED, INCLUDING BUT NOT LIMITED TO THE WARRANTIES OF MERCHANTABILITY,
-# FITNESS FOR A PARTICULAR PURPOSE AND NONINFRINGEMENT. IN NO EVENT SHALL THE
-# AUTHORS OR COPYRIGHT HOLDERS BE LIABLE FOR ANY CLAIM, DAMAGES OR OTHER
-# LIABILITY, WHETHER IN AN ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING FROM,
-# OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE
-# SOFTWARE.
-#
-# SPDX-License-Identifier: MIT
-
 from gi.repository import Adw, Gio, GLib, Gtk
 
 
@@ -45,3 +21,26 @@ class MainWindow(Adw.ApplicationWindow):
         self.settings.bind(
             "window-maximized", self, "maximized", Gio.SettingsBindFlags.DEFAULT
         )
+
+        self.create_action("notes-folder", self.on_change_notes_folder)
+
+    def create_action(self, name, callback):
+        action = Gio.SimpleAction(name=name)
+        action.connect("activate", callback)
+        self.add_action(action)
+
+
+    def on_change_notes_folder(self, action, parameter):
+        dialog = Gtk.FileDialog()
+
+        home_path = GLib.get_home_dir()
+        initial_folder = Gio.File.new_for_path(str(home_path))
+        dialog.set_initial_folder(initial_folder)
+
+        dialog.select_folder(self, None, self.on_open_response)
+
+    def on_open_response(self, dialog: Gtk.FileDialog, result):
+        folder_path = dialog.select_folder_finish(result).get_path()
+
+        if folder_path is not None:
+            self.settings.set_string("notes-folder", folder_path)

@@ -13,5 +13,8 @@
 	  <key name="dark-mode" type="b">
       <default>false</default>
     </key>
+    <key name="notes-folder" type="s">
+        <default>""</default>
+    </key>
 	</schema>
 </schemalist>

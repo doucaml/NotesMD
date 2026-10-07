@@ -1,35 +1,11 @@
-# MIT License
-#
-# Copyright (c) 2026 Mohamed Doucouré
-#
-# Permission is hereby granted, free of charge, to any person obtaining a copy
-# of this software and associated documentation files (the "Software"), to deal
-# in the Software without restriction, including without limitation the rights
-# to use, copy, modify, merge, publish, distribute, sublicense, and/or sell
-# copies of the Software, and to permit persons to whom the Software is
-# furnished to do so, subject to the following conditions:
-#
-# The above copyright notice and this permission notice shall be included in all
-# copies or substantial portions of the Software.
-#
-# THE SOFTWARE IS PROVIDED "AS IS", WITHOUT WARRANTY OF ANY KIND, EXPRESS OR
-# IMPLIED, INCLUDING BUT NOT LIMITED TO THE WARRANTIES OF MERCHANTABILITY,
-# FITNESS FOR A PARTICULAR PURPOSE AND NONINFRINGEMENT. IN NO EVENT SHALL THE
-# AUTHORS OR COPYRIGHT HOLDERS BE LIABLE FOR ANY CLAIM, DAMAGES OR OTHER
-# LIABILITY, WHETHER IN AN ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING FROM,
-# OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE
-# SOFTWARE.
-#
-# SPDX-License-Identifier: MIT
-
-from gi.repository import Adw, Gio, GLib, Gtk
-
+from gi.repository import Adw, GLib, Gio, Gtk
+from datetime import datetime
 
 @Gtk.Template(resource_path="/com/doucaml/notesmd/ui/note-window.ui")
 class NoteWindow(Adw.ApplicationWindow):
     __gtype_name__ = "NoteWindow"
 
-    main_text_view = Gtk.Template.Child()
+    main_text_view: Gtk.TextView = Gtk.Template.Child()
     cursor_pos = Gtk.Template.Child()
     toast_overlay = Gtk.Template.Child()
 
@@ -50,58 +26,7 @@ class NoteWindow(Adw.ApplicationWindow):
             "window-maximized", self, "maximized", Gio.SettingsBindFlags.DEFAULT
         )
 
-    def close(self):
-        print("The window is closed.")
-        super().close()
-
-    def open_file_dialog(self, action, _):
-        native = Gtk.FileDialog()
-        native.open(self, None, self.on_open_response)
-
-    def on_open_response(self, dialog, result):
-        file = dialog.open_finish(result)
-
-        if file is not None:
-            self.open_file(file)
-
-    def open_file(self, file):
-        file.load_contents_async(None, self.open_file_complete)
-
-    def open_file_complete(self, file, result):
-        info = file.query_info("standard::display-name", Gio.FileQueryInfoFlags.NONE)
-
-        if info:
-            display_name = info.get_attribute_string("standard::display-name")
-
-        else:
-            display_name = file.get_basename()
-
-        contents = file.load_contents_finish(result)
-
-        if not contents[0]:
-            path = file.seek_path()
-            self.toast_overlay.add_toast(
-                Adw.Toast(title=f"Unable to open “{display_name}”")
-            )
-            return
-
-        try:
-            text = contents[1].decode("utf-8")
-
-        except UnicodeError as err:
-            path = file.peek_path()
-            self.toast_overlay.add_toast(
-                Adw.Toast(title=f"Invalid text encoding for “{display_name}”")
-            )
-            return
-
-        buffer = self.main_text_view.get_buffer()
-        buffer.set_text(text)
-        start = buffer.get_start_iter()
-        buffer.place_cursor(start)
-
-        self.set_title(display_name)
-        self.toast_overlay.add_toast(Adw.Toast(title=f"Opened “{display_name}”"))
+        self.connect("close_request", self.on_win_close)
 
     def update_cursor_position(self, buffer, _):
         cursor_pos = buffer.props.cursor_position
@@ -112,40 +37,19 @@ class NoteWindow(Adw.ApplicationWindow):
 
         self.cursor_pos.set_text(f"Ln {line}, Col {column}")
 
-    def on_save_response(self, dialog, result):
-        file = dialog.save_finish(result)
+    def on_win_close(self, *args):
+        notes_folder = self.settings.get_string("notes-folder")
 
-        if file is not None:
-            self.save_file(file)
+        filename = datetime.now().isoformat().replace(":", "-").replace(".", "") + ".md"
+        file = Gio.File.new_for_path(f"{notes_folder}/{filename}")
 
-    def save_file(self, file):
         buffer = self.main_text_view.get_buffer()
+        start_iter, end_iter = buffer.get_start_iter(), buffer.get_end_iter()
 
-        start = buffer.get_start_iter()
-        end = buffer.get_end_iter()
-        text = buffer.get_text(start, end, False)
+        text = buffer.get_text(start_iter, end_iter, True)
 
-        if not text:
-            return
+        if len(text) > 0:
+            bytes = GLib.Bytes.new(text.encode("utf-8"))
 
-        bytes = GLib.Bytes.new(text.encode("utf-8"))
-
-        file.replace_contents_bytes_async(
-            bytes, None, False, Gio.FileCreateFlags.NONE, None, self.save_file_complete
-        )
-
-    def save_file_complete(self, file, result):
-        res = file.replace_contents_finish(result)
-        info = file.query_info("standard::display-name", Gio.FileQueryInfoFlags.NONE)
-        if info:
-            display_name = info.get_attribute_string("standard::display-name")
-
-        else:
-            display_name = file.get_basename()
-
-        if not res:
-            msg = f"Unable to save as “{display_name}”"
-
-        else:
-            msg = f"Saved as “{display_name}”"
-        self.toast_overlay.add_toast(Adw.Toast(title=msg))
+            out_stream = file.create(Gio.FileCreateFlags.NONE)
+            out_stream.write_bytes(bytes)
