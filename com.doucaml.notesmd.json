@@ -1,7 +1,7 @@
 {
   "id": "com.doucaml.notesmd",
   "runtime": "org.gnome.Platform",
-  "runtime-version": "master",
+  "runtime-version": "50",
   "sdk": "org.gnome.Sdk",
   "command": "notesmd",
   "finish-args": [
@@ -29,8 +29,9 @@
       "buildsystem": "meson",
       "sources": [
         {
-          "type": "git",
-          "url": "file:///home/mohamed/Documents/gnome-projects"
+          "type": "dir",
+          "path": ".",
+          "skip": ["builddir", "builddir-flatpak", ".flatpak-builder", ".git"]
         }
       ],
       "config-opts": ["--libdir=lib"]
