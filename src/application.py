@@ -9,7 +9,6 @@ gi.require_version("Adw", "1")
 from gi.repository import Adw, Gio, GLib
 
 from .main_window import MainWindow
-from .note_window import NoteWindow
 
 
 class MainApplication(Adw.Application):
@@ -22,7 +21,6 @@ class MainApplication(Adw.Application):
         self.create_action("quit", lambda *_: self.quit(), ["<control>q"])
         self.create_action("about", self.on_about_action)
         self.create_action("preferences", self.on_preferences_action)
-        self.create_action("new-note", self.on_create_new_note, ["<control>n"])
 
         self.settings = Gio.Settings(schema_id="com.doucaml.notesmd")
 
@@ -74,10 +72,6 @@ class MainApplication(Adw.Application):
 
         action.set_state(new_state)
         self.settings.set_boolean("dark-mode", dark_mode)
-
-    def on_create_new_note(self, action, _):
-        win = NoteWindow(application=self)
-        win.present()
 
     def on_about_action(self, *args):
         stream = Gio.resources_open_stream(

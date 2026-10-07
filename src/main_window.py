@@ -1,5 +1,6 @@
 from gi.repository import Adw, Gio, GLib, Gtk
 
+from .note_window import NoteWindow
 
 @Gtk.Template(resource_path="/com/doucaml/notesmd/ui/main-window.ui")
 class MainWindow(Adw.ApplicationWindow):
@@ -23,12 +24,16 @@ class MainWindow(Adw.ApplicationWindow):
         )
 
         self.create_action("notes-folder", self.on_change_notes_folder)
+        self.create_action("new-note", self.on_create_new_note)
 
     def create_action(self, name, callback):
         action = Gio.SimpleAction(name=name)
         action.connect("activate", callback)
         self.add_action(action)
 
+    def on_create_new_note(self, action, _):
+        win = NoteWindow(application=self.get_application())
+        win.present()
 
     def on_change_notes_folder(self, action, parameter):
         dialog = Gtk.FileDialog()
@@ -37,9 +42,9 @@ class MainWindow(Adw.ApplicationWindow):
         initial_folder = Gio.File.new_for_path(str(home_path))
         dialog.set_initial_folder(initial_folder)
 
-        dialog.select_folder(self, None, self.on_open_response)
+        dialog.select_folder(self, None, self.on_change_response)
 
-    def on_open_response(self, dialog: Gtk.FileDialog, result):
+    def on_change_response(self, dialog: Gtk.FileDialog, result):
         folder_path = dialog.select_folder_finish(result).get_path()
 
         if folder_path is not None:
