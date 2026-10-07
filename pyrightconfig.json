@@ -1,0 +1,7 @@
+{
+  "include": ["src"],
+  "typeCheckingMode": "basic",
+  "stubPath": ".zed/typings",
+  "extraPaths": ["/usr/lib/python3/dist-packages"],
+  "reportMissingModuleSource": "none"
+}

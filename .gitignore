@@ -1,0 +1,4 @@
+builddir/
+builddir-flatpak/
+.flatpak-builder/
+.zed/typings/

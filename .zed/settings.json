@@ -1,0 +1,24 @@
+// Folder-specific settings
+//
+// For a full list of overridable settings, and general information on folder-specific settings,
+// see the documentation: https://zed.dev/docs/configuring-zed#settings-files
+{
+  "languages": {
+    "Python": {
+      "language_servers": ["pyright"]
+    }
+  },
+  "lsp": {
+    "pyright": {
+      "settings": {
+        "python": {
+          "pythonPath": "/usr/bin/python3",
+          "analysis": {
+            "extraPaths": ["/usr/lib/python3/dist-packages"],
+            "typeCheckingMode": "basic"
+          }
+        }
+      }
+    }
+  }
+}
