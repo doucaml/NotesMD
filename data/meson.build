@@ -1,11 +1,23 @@
 datadir = get_option('datadir')
 pkgdatadir = get_option('prefix') / get_option('datadir') / meson.project_name()
 
+blueprints = custom_target('blueprints',
+  input: files(
+    'ui/main-window.blp',
+    'ui/note-window.blp',
+    'ui/shortcuts-dialog.blp',
+
+  ),
+  output: '.',
+  command: [find_program('blueprint-compiler'), 'batch-compile', '--minify', '@OUTPUT@', '@CURRENT_SOURCE_DIR@', '@INPUT@'],
+)
+
 gnome.compile_resources('notesmd',
   'notesmd.gresource.xml',
   gresource_bundle: true,
   install: true,
   install_dir: pkgdatadir,
+  dependencies: blueprints,
 )
 
 desktop_file = i18n.merge_file(

@@ -1,0 +1,40 @@
+using Gtk 4.0;
+using Adw 1;
+
+template $NoteWindow: Adw.ApplicationWindow {
+  title: "Note";
+  default-width: 300;
+  default-height: 300;
+
+  styles ["devel"]
+
+  content: Adw.ToolbarView {
+
+    [top]
+    Adw.HeaderBar {
+
+      [end]
+      Label cursor_pos {
+        label: "Ln 0, Col 0";
+      }
+
+      styles ["dim-label", "numeric"]
+    }
+
+    content: Adw.ToastOverlay toast_overlay {
+
+      child: ScrolledWindow {
+        hexpand: true;
+        vexpand: true;
+        margin-top: 6;
+        margin-bottom: 6;
+        margin-start: 6;
+        margin-end: 6;
+
+        child: TextView main_text_view {
+          monospace: true;
+        };
+      };
+    };
+  };
+}

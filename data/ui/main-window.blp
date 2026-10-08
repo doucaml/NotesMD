@@ -1,0 +1,58 @@
+using Gtk 4.0;
+using Adw 1;
+
+template $MainWindow : Adw.ApplicationWindow {
+  title: "NotesMD";
+  default-width: 800;
+  default-height: 700;
+
+  styles ["devel"]
+
+  [content]
+  Adw.ToolbarView {
+
+    [top]
+    Adw.HeaderBar {
+
+      [end]
+      MenuButton {
+        primary: true;
+        icon-name: "open-menu-symbolic";
+        tooltip-text: "Main Menu";
+        menu-model: primary_menu;
+      }
+    }
+
+    content: Adw.ToastOverlay toast_overlay {
+
+      child: Box {
+        valign: center;
+        halign: center;
+
+        Button {
+          label: "Create a note";
+          action-name: "win.new-note";
+        }
+      };
+    };
+  }
+}
+
+menu primary_menu {
+  section {
+    item {
+      label: "Change notes folder";
+      action: "win.notes-folder";
+    }
+
+    item {
+      label: "Dark mode";
+      action: "app.dark-mode";
+    }
+
+    item {
+      label: "About NotesMD";
+      action: "app.about";
+    }
+  }
+}
