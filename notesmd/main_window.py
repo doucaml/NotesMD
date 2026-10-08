@@ -6,8 +6,7 @@ from .note_window import NoteWindow
 class MainWindow(Adw.ApplicationWindow):
     __gtype_name__ = "MainWindow"
 
-    new_note_btn = Gtk.Template.Child()
-    toast_overlay = Gtk.Template.Child()
+    # notes_box: Gtk.Box = Gtk.Template.Child()
 
     def __init__(self, **kwargs):
         super().__init__(**kwargs)
@@ -25,6 +24,10 @@ class MainWindow(Adw.ApplicationWindow):
 
         self.create_action("notes-folder", self.on_change_notes_folder)
         self.create_action("new-note", self.on_create_new_note)
+
+        # for i in range(1, 4):
+        #     self.notes_box.append(Gtk.Label.new(f"label {i}"))
+
 
     def create_action(self, name, callback):
         action = Gio.SimpleAction(name=name)
