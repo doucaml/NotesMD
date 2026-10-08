@@ -11,23 +11,21 @@ class MainWindow(Adw.ApplicationWindow):
     def __init__(self, **kwargs):
         super().__init__(**kwargs)
 
+        self.app = kwargs.get("application")
+
         self.settings = Gio.Settings(schema_id="com.doucaml.notesmd")
         self.settings.bind(
-            "window-width", self, "default-width", Gio.SettingsBindFlags.DEFAULT
+            "main-window-width", self, "default-width", Gio.SettingsBindFlags.DEFAULT
         )
         self.settings.bind(
-            "window-height", self, "default-height", Gio.SettingsBindFlags.DEFAULT
+            "main-window-height", self, "default-height", Gio.SettingsBindFlags.DEFAULT
         )
         self.settings.bind(
-            "window-maximized", self, "maximized", Gio.SettingsBindFlags.DEFAULT
+            "main-window-maximized", self, "maximized", Gio.SettingsBindFlags.DEFAULT
         )
 
         self.create_action("notes-folder", self.on_change_notes_folder)
         self.create_action("new-note", self.on_create_new_note)
-
-        # for i in range(1, 4):
-        #     self.notes_box.append(Gtk.Label.new(f"label {i}"))
-
 
     def create_action(self, name, callback):
         action = Gio.SimpleAction(name=name)
@@ -35,7 +33,7 @@ class MainWindow(Adw.ApplicationWindow):
         self.add_action(action)
 
     def on_create_new_note(self, action, _):
-        win = NoteWindow(application=self.get_application())
+        win = NoteWindow(application=self.app)
         win.present()
 
     def on_change_notes_folder(self, action, parameter):

@@ -16,16 +16,6 @@ class NoteWindow(Adw.ApplicationWindow):
         buffer.connect("notify::cursor-position", self.update_cursor_position)
 
         self.settings = Gio.Settings(schema_id="com.doucaml.notesmd")
-        self.settings.bind(
-            "window-width", self, "default-width", Gio.SettingsBindFlags.DEFAULT
-        )
-        self.settings.bind(
-            "window-height", self, "default-height", Gio.SettingsBindFlags.DEFAULT
-        )
-        self.settings.bind(
-            "window-maximized", self, "maximized", Gio.SettingsBindFlags.DEFAULT
-        )
-
         self.connect("close_request", self.on_win_close)
 
     def update_cursor_position(self, buffer, _):

@@ -1,13 +1,13 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <schemalist gettext-domain="notesmd">
 	<schema id="com.doucaml.notesmd" path="/com/doucaml/notesmd/">
-	  <key name="window-width" type="i">
+	  <key name="main-window-width" type="i">
       <default>600</default>
     </key>
-    <key name="window-height" type="i">
+    <key name="main-window-height" type="i">
       <default>600</default>
     </key>
-    <key name="window-maximized" type="b">
+    <key name="main-window-maximized" type="b">
       <default>false</default>
     </key>
 	  <key name="dark-mode" type="b">
