@@ -1,0 +1,33 @@
+using Gtk 4.0;
+
+template $NotePreview: Box {
+  margin-bottom: 8;
+  margin-top: 8;
+  margin-end: 8;
+  margin-start: 8;
+  hexpand:true;
+  hexpand-set: true;
+
+  Box {
+    orientation: vertical;
+
+    Label {
+      hexpand: true;
+      hexpand-set: true;
+      label: "Un text pour tester.";
+    }
+
+    Box {
+      orientation: horizontal;
+      halign: end;
+
+      Button {
+        icon-name: "trash-symbolic";
+      }
+
+      Button {
+        label: "Open";
+      }
+    }
+  }
+}

@@ -1,12 +1,11 @@
 from gi.repository import Adw, Gio, GLib, Gtk
 
 from .note_window import NoteWindow
+from .note_preview import NotePreview
 
 @Gtk.Template(resource_path="/com/doucaml/notesmd/ui/main-window.ui")
 class MainWindow(Adw.ApplicationWindow):
     __gtype_name__ = "MainWindow"
-
-    # notes_box: Gtk.Box = Gtk.Template.Child()
 
     def __init__(self, **kwargs):
         super().__init__(**kwargs)

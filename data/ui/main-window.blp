@@ -26,13 +26,10 @@ template $MainWindow : Adw.ApplicationWindow {
     content: Adw.ToastOverlay toast_overlay {
 
       child: Box {
-        valign: center;
-        halign: center;
+        valign: start;
+        halign: fill;
 
-        Button {
-          label: "Create a note";
-          action-name: "win.new-note";
-        }
+        $NotePreview {}
       };
     };
   }

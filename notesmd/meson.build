@@ -23,7 +23,8 @@ notesmd_sources = [
   '__init__.py',
   'application.py',
   'main_window.py',
-  'note_window.py'
+  'note_window.py',
+  'note_preview.py',
 ]
 
 install_data(notesmd_sources, install_dir: moduledir)

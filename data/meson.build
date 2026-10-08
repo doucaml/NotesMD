@@ -6,6 +6,7 @@ blueprints = custom_target('blueprints',
     'ui/main-window.blp',
     'ui/note-window.blp',
     'ui/shortcuts-dialog.blp',
+    'ui/note-preview.blp',
 
   ),
   output: '.',

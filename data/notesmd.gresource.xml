@@ -2,8 +2,9 @@
 <gresources>
   <gresource prefix="/com/doucaml/notesmd">
     <file preprocess="json-stripblanks" alias="metadata/app-infos.json">app-info.json</file>
+    <file preprocess="xml-stripblanks">ui/shortcuts-dialog.ui</file>
     <file preprocess="xml-stripblanks">ui/main-window.ui</file>
     <file preprocess="xml-stripblanks">ui/note-window.ui</file>
-    <file preprocess="xml-stripblanks">ui/shortcuts-dialog.ui</file>
+    <file preprocess="xml-stripblanks">ui/note-preview.ui</file>
   </gresource>
 </gresources>
