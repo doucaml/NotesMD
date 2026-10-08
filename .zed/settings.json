@@ -4,9 +4,15 @@
 // see the documentation: https://zed.dev/docs/configuring-zed#settings-files
 {
   "languages": {
+    "XML": {
+      "jsx_tag_auto_close": {
+        "enabled": false
+      },
+      "format_on_save": "off"
+    },
     "Python": {
       "language_servers": ["pyright"]
-    }
+    },
   },
   "lsp": {
     "pyright": {
@@ -20,5 +26,8 @@
         }
       }
     }
+  },
+  "file_types": {
+    "XML": ["ui"]
   }
 }
