@@ -9,8 +9,11 @@ class NotePreview(Gtk.Box):
     delete_note_btn = Gtk.Template.Child()
     open_note_btn = Gtk.Template.Child()
 
-    def __init__(self, note_path: Gio.File, **kwargs):
+    def __init__(self, note_path, **kwargs):
         super().__init__(**kwargs)
+
+        self.note_path = note_path
+        self.app = kwargs.get("application")
 
         self.load_text(note_path)
 
@@ -21,9 +24,10 @@ class NotePreview(Gtk.Box):
         self.preview_label.set_label(text)
 
     @Gtk.Template.Callback()
-    def on_open_note(self):
+    def on_open_note(self, *args):
         pass
 
     @Gtk.Template.Callback()
-    def on_delete_note(self):
-        pass
+    def on_delete_note(self, *args):
+        file = Gio.File.new_for_path(self.note_path)
+        file.delete()
