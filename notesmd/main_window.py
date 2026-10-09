@@ -28,12 +28,10 @@ class MainWindow(Adw.ApplicationWindow):
         self.create_action("notes-folder", self.on_change_notes_folder)
         self.create_action("new-note", self.on_create_new_note)
 
-        self.add_notes_previews()
+        self.file_monitor = self.get_notes_folder_monitor()
+        self.file_monitor.connect("changed", self.on_dir_change)
 
-    def create_action(self, name, callback):
-        action = Gio.SimpleAction(name=name)
-        action.connect("activate", callback)
-        self.add_action(action)
+        self.add_notes_previews()
 
     def on_create_new_note(self, action, _):
         win = NoteWindow(application=self.app)
@@ -57,13 +55,38 @@ class MainWindow(Adw.ApplicationWindow):
         if folder_path is not None:
             self.settings.set_string("notes-folder", folder_path)
 
-    def append_preview_note(self, note_path):
-        note_preview = NotePreview(note_path)
-        self.previews_container.append(note_preview)
+    def on_dir_change(self, *args):
+        event_type = args[3]
 
-    def get_previews(self):
+        print(event_type)
+
+        used_event_types_set = (
+            Gio.FileMonitorEvent.CHANGED,
+            Gio.FileMonitorEvent.DELETED
+        )
+
+        if event_type in used_event_types_set:
+            self.update_preview_container()
+
+    def create_action(self, name, callback):
+        action = Gio.SimpleAction(name=name)
+        action.connect("activate", callback)
+        self.add_action(action)
+
+    def get_notes_dir(self):
         notes_folder_path = self.settings.get_string("notes-folder")
         notes_folder = Gio.File.new_for_path(notes_folder_path)
+
+        return [notes_folder, notes_folder_path]
+
+    def get_notes_folder_monitor(self):
+        notes_folder, _ = self.get_notes_dir()
+        file_monitor = notes_folder.monitor_directory(Gio.FileMonitorFlags.WATCH_MOVES)
+
+        return file_monitor
+
+    def get_notes_paths(self):
+        notes_folder, notes_folder_path = self.get_notes_dir()
 
         notes_folder_children = notes_folder.enumerate_children(
             "standard::name, standard::type",
@@ -80,7 +103,14 @@ class MainWindow(Adw.ApplicationWindow):
         return children
 
     def add_notes_previews(self):
-        notes_files = self.get_previews()
+        notes_paths = self.get_notes_paths()
 
-        for file in notes_files:
-            self.append_preview_note(file)
+        for file in notes_paths:
+            note_preview = NotePreview(file)
+            self.previews_container.append(note_preview)
+
+    def update_preview_container(self):
+        while child := self.previews_container.get_first_child():
+            self.previews_container.remove(child)
+
+        self.add_notes_previews()
