@@ -1,5 +1,6 @@
 from gi.repository import Gtk, Gio
 
+from .note_window import NoteWindow
 
 @Gtk.Template(resource_path="/com/doucaml/notesmd/ui/note-preview.ui")
 class NotePreview(Gtk.Box):
@@ -25,7 +26,8 @@ class NotePreview(Gtk.Box):
 
     @Gtk.Template.Callback()
     def on_open_note(self, *args):
-        pass
+        win = NoteWindow(note_path=self.note_path)
+        win.present()
 
     @Gtk.Template.Callback()
     def on_delete_note(self, *args):
