@@ -13,11 +13,6 @@ template $NoteWindow: Adw.ApplicationWindow {
     [top]
     Adw.HeaderBar {
 
-      [end]
-      Label cursor_pos {
-        label: "Ln 0, Col 0";
-      }
-
       styles ["dim-label", "numeric"]
     }
 
@@ -32,6 +27,7 @@ template $NoteWindow: Adw.ApplicationWindow {
         margin-end: 6;
 
         child: TextView main_text_view {
+          wrap-mode: word;
           monospace: true;
         };
       };
