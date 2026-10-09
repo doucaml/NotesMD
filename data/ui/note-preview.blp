@@ -32,14 +32,14 @@ template $NotePreview: Box {
         styles ["destructive-action"]
 
         icon-name: "trash-symbolic";
-        $clicked => on_delete_note();
+        clicked => $on_delete_note();
       }
 
       Button open_note_btn {
         styles ["suggested-action"]
 
         label: "Open";
-        $clicked => on_open_note();
+        clicked => $on_open_note();
       }
     }
   }
