@@ -31,12 +31,14 @@ template $MainWindow : Adw.ApplicationWindow {
 
     content: Adw.ToastOverlay toast_overlay {
 
+      child: ScrolledWindow {
 
-      child: Box previews_container {
-        valign: start;
-        halign: fill;
-        spacing: 16;
-        orientation: vertical;
+        child: Box previews_container {
+          valign: start;
+          halign: fill;
+          spacing: 16;
+          orientation: vertical;
+        };
       };
     };
   }
