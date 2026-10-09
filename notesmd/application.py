@@ -6,7 +6,7 @@ import gi
 gi.require_version("Gtk", "4.0")
 gi.require_version("Adw", "1")
 
-from gi.repository import Adw, Gio, GLib
+from gi.repository import Adw, Gdk, Gio, GLib, Gtk
 
 from .main_window import MainWindow
 
@@ -18,6 +18,20 @@ class MainApplication(Adw.Application):
             flags=Gio.ApplicationFlags.DEFAULT_FLAGS,
             resource_base_path="/com/doucaml/notesmd",
         )
+
+        display = Gdk.Display.get_default()
+
+        if display:
+            provider = Gtk.CssProvider.new()
+            provider.load_from_resource("/com/doucaml/notesmd/styles/main.css")
+            Gtk.StyleContext.add_provider_for_display(
+                display,
+                provider,
+                Gtk.STYLE_PROVIDER_PRIORITY_APPLICATION
+            )
+        else:
+            print("css style not mounted; display is null")
+
         self.create_action("quit", lambda *_: self.quit(), ["<control>q"])
         self.create_action("about", self.on_about_action)
         self.create_action("preferences", self.on_preferences_action)
