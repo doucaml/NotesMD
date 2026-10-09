@@ -58,14 +58,12 @@ class MainWindow(Adw.ApplicationWindow):
     def on_dir_change(self, *args):
         event_type = args[3]
 
-        print(event_type)
-
-        used_event_types_set = (
+        used_event_types_tuple = (
             Gio.FileMonitorEvent.CHANGED,
             Gio.FileMonitorEvent.DELETED
         )
 
-        if event_type in used_event_types_set:
+        if event_type in used_event_types_tuple:
             self.update_preview_container()
 
     def create_action(self, name, callback):
