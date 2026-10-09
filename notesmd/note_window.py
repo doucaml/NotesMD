@@ -8,7 +8,7 @@ class NoteWindow(Adw.ApplicationWindow):
     main_text_view: Gtk.TextView = Gtk.Template.Child()
     toast_overlay = Gtk.Template.Child()
 
-    def __init__(self, note_path, **kwargs):
+    def __init__(self, note_path = None, **kwargs):
         super().__init__(**kwargs)
 
         self.note_path = note_path
