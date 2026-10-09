@@ -14,7 +14,7 @@ template $NotePreview: Box {
     Label preview_label {
       styles ["label", "preview-text"]
 
-      label: "Un text pour tester.";
+      label: "";
       wrap: true;
       hexpand: true;
       height-request: 120;
@@ -28,16 +28,18 @@ template $NotePreview: Box {
       halign: end;
       spacing: 12;
 
-      Button {
+      Button delete_note_btn {
         styles ["destructive-action"]
 
         icon-name: "trash-symbolic";
+        $clicked => on_delete_note();
       }
 
-      Button {
+      Button open_note_btn {
         styles ["suggested-action"]
 
         label: "Open";
+        $clicked => on_open_note();
       }
     }
   }

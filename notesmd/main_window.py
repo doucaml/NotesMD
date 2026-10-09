@@ -7,6 +7,8 @@ from .note_preview import NotePreview
 class MainWindow(Adw.ApplicationWindow):
     __gtype_name__ = "MainWindow"
 
+    previews_container = Gtk.Template.Child()
+
     def __init__(self, **kwargs):
         super().__init__(**kwargs)
 
@@ -25,6 +27,8 @@ class MainWindow(Adw.ApplicationWindow):
 
         self.create_action("notes-folder", self.on_change_notes_folder)
         self.create_action("new-note", self.on_create_new_note)
+
+        self.add_notes_previews()
 
     def create_action(self, name, callback):
         action = Gio.SimpleAction(name=name)
@@ -52,3 +56,31 @@ class MainWindow(Adw.ApplicationWindow):
 
         if folder_path is not None:
             self.settings.set_string("notes-folder", folder_path)
+
+    def append_preview_note(self, note_path):
+        note_preview = NotePreview(note_path)
+        self.previews_container.append(note_preview)
+
+    def get_previews(self):
+        notes_folder_path = self.settings.get_string("notes-folder")
+        notes_folder = Gio.File.new_for_path(notes_folder_path)
+
+        notes_folder_children = notes_folder.enumerate_children(
+            "standard::name, standard::type",
+            Gio.FileQueryInfoFlags.NONE
+        )
+
+        children = []
+
+        while child := notes_folder_children.next_file():
+            if child.get_file_type() is Gio.FileType.REGULAR:
+                child_path = f"{notes_folder_path}/{child.get_name()}"
+                children.append(child_path)
+
+        return children
+
+    def add_notes_previews(self):
+        notes_files = self.get_previews()
+
+        for file in notes_files:
+            self.append_preview_note(file)

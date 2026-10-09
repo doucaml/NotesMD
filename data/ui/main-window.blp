@@ -21,15 +21,21 @@ template $MainWindow : Adw.ApplicationWindow {
         tooltip-text: "Main Menu";
         menu-model: primary_menu;
       }
+
+      [end]
+      Button new_note_btn {
+        icon-name: "plus-large-symbolic";
+      }
     }
 
     content: Adw.ToastOverlay toast_overlay {
 
-      child: Box {
+
+      child: Box previews_container {
         valign: start;
         halign: fill;
-
-        $NotePreview {}
+        spacing: 16;
+        orientation: vertical;
       };
     };
   }
