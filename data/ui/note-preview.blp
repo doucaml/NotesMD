@@ -6,26 +6,37 @@ template $NotePreview: Box {
   margin-end: 8;
   margin-start: 8;
   hexpand:true;
-  hexpand-set: true;
 
   Box {
     orientation: vertical;
+    spacing: 12;
 
-    Label {
-      hexpand: true;
-      hexpand-set: true;
+    Label preview_label {
+      styles ["label", "preview-text"]
+
       label: "Un text pour tester.";
+      wrap: true;
+      hexpand: true;
+      height-request: 120;
+      valign: start;
+      xalign: 0;
+      yalign: 0;
     }
 
     Box {
       orientation: horizontal;
       halign: end;
+      spacing: 12;
 
       Button {
+        styles ["destructive-action"]
+
         icon-name: "trash-symbolic";
       }
 
       Button {
+        styles ["suggested-action"]
+
         label: "Open";
       }
     }
