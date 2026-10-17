@@ -29,7 +29,8 @@ class MainWindow(Adw.ApplicationWindow):
         self.create_action("new-note", self.on_create_new_note)
 
         self.file_monitor = self.get_notes_folder_monitor()
-        self.file_monitor.connect("changed", self.on_dir_change)
+        if  self.file_monitor:
+            self.file_monitor.connect("changed", self.on_dir_change)
 
         self.add_notes_previews()
 
@@ -46,7 +47,6 @@ class MainWindow(Adw.ApplicationWindow):
 
         initial_folder = Gio.File.new_for_path(used_path)
         dialog.set_initial_folder(initial_folder)
-
         dialog.select_folder(self, None, self.on_change_response)
 
     def on_change_response(self, dialog: Gtk.FileDialog, result):
@@ -54,6 +54,11 @@ class MainWindow(Adw.ApplicationWindow):
 
         if folder_path is not None:
             self.settings.set_string("notes-folder", folder_path)
+            self.file_monitor = self.get_notes_folder_monitor()
+
+            if self.file_monitor:
+                self.update_preview_container()
+                self.file_monitor.connect("changed", self.on_dir_change)
 
     def on_dir_change(self, *args):
         event_type = args[3]
@@ -73,18 +78,27 @@ class MainWindow(Adw.ApplicationWindow):
 
     def get_notes_dir(self):
         notes_folder_path = self.settings.get_string("notes-folder")
+        if not notes_folder_path:
+            raise ValueError("Notes folder not specified.")
+
         notes_folder = Gio.File.new_for_path(notes_folder_path)
 
         return [notes_folder, notes_folder_path]
 
     def get_notes_folder_monitor(self):
-        notes_folder, _ = self.get_notes_dir()
-        file_monitor = notes_folder.monitor_directory(Gio.FileMonitorFlags.WATCH_MOVES)
+        try:
+            notes_folder, _ = self.get_notes_dir()
+        except ValueError:
+            return
 
+        file_monitor = notes_folder.monitor_directory(Gio.FileMonitorFlags.WATCH_MOVES)
         return file_monitor
 
     def get_notes_paths(self):
-        notes_folder, notes_folder_path = self.get_notes_dir()
+        try:
+            notes_folder, notes_folder_path = self.get_notes_dir()
+        except ValueError:
+            return []
 
         notes_folder_children = notes_folder.enumerate_children(
             "standard::name, standard::type",
