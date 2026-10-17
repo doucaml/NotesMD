@@ -1,4 +1,12 @@
-run-flatpak:
+run-flatpak-devel:
+	flatpak-builder --user \
+    --install \
+    --force-clean \
+    builddir-flatpak-devel \
+    com.doucaml.notesmd.Devel.json
+	flatpak run com.doucaml.notesmd.Devel
+
+run-flatpak-prod:
 	flatpak-builder --user \
     --install \
     --force-clean \

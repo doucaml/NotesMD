@@ -1,7 +1,7 @@
 [Desktop Entry]
 Name=NotesMD
 Exec=notesmd
-Icon=com.doucaml.notesmd
+Icon=@icon@
 Terminal=false
 Type=Application
 Categories=Utility;

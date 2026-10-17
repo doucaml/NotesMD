@@ -40,15 +40,21 @@ locale.bindtextdomain("notesmd", localedir)
 locale.textdomain("notesmd")
 gettext.install("notesmd", localedir)
 
-if __name__ == "__main__":
+def run_application():
+    from notesmd import application
+
+    app = application.MainApplication('@APP_ID@')
+    return app.run(sys.argv)
+
+def main():
     import gi
     from gi.repository import Gio
 
-    resource_path = Path(pkgdatadir) / "notesmd.gresource"
-
-    resource = Gio.resource_load(resource_path.as_posix())
+    resource_path = str(Path(pkgdatadir) / "notesmd.gresource")
+    resource = Gio.resource_load(resource_path)
     Gio.resources_register(resource)
 
-    from notesmd import application
+    return run_application()
 
-    sys.exit(application.main(VERSION))
+if __name__ == "__main__":
+    sys.exit(main())

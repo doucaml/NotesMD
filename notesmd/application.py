@@ -1,20 +1,16 @@
 import json
-import sys
-
 import gi
 
 gi.require_version("Gtk", "4.0")
 gi.require_version("Adw", "1")
 
 from gi.repository import Adw, Gdk, Gio, GLib, Gtk
-
 from .main_window import MainWindow
 
-
 class MainApplication(Adw.Application):
-    def __init__(self):
+    def __init__(self, application_id):
         super().__init__(
-            application_id="com.doucaml.notesmd",
+            application_id=application_id,
             flags=Gio.ApplicationFlags.DEFAULT_FLAGS,
             resource_base_path="/com/doucaml/notesmd",
         )
@@ -109,8 +105,3 @@ class MainApplication(Adw.Application):
 
     def on_preferences_action(self, widget, _):
         print("app.preferences action activated")
-
-
-def main(version):
-    app = MainApplication()
-    return app.run(sys.argv)
